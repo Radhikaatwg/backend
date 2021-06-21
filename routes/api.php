@@ -66,7 +66,7 @@ Route::group([
     Route::get('/lawyer_service_index', 'App\Http\Controllers\Api\LawyerController@lawyer_index');
     Route::post('/lawyer_page', 'App\Http\Controllers\Api\LawyerController@lawyer_check');
 
-    Route::post('/product_review', 'App\Http\Controllers\Api\ReviewsController@product_review');
+    Route::post('/product_review', 'App\Http\Controllers\Api\ReviewsController@product_review');Route::post('/product_Searching', 'App\Http\Controllers\Api\ProductController@propertysearch_list');
 
     Route::group([
         'middleware' => 'auth:api'
@@ -97,6 +97,7 @@ Route::group([
         Route::post('/lawyer_create_service', 'App\Http\Controllers\Api\LawyerController@lawyer_create_service');
         Route::get('/lawyer_service', 'App\Http\Controllers\Api\LawyerController@lawyer_service');
         Route::post('/lawyer_service_delete', 'App\Http\Controllers\Api\LawyerController@lawyer_service_delete');
+       Route::post('/product_Searching_login', 'App\Http\Controllers\Api\ProductController@User_propertysearchlist');
 
 
     });

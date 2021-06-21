@@ -79,10 +79,61 @@ class product extends Model
 
         return $this->hasMany('App\Models\product', 'id');
     }
+    public function UserDetail()
+    {
+        return $this->hasOne('App\Models\User', 'id','user_id');
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany('App\Models\Wishlist', 'product_id','id');
+    }
 
     public function roles()
     {
 
+    }
+
+    public function scopeSearch($query, $searchTerm) {
+        if ($searchTerm->build_name) {
+            $query = $query->where('build_name', 'like', "%" . $searchTerm->build_name . "%");
+        }
+        if ($searchTerm->Location) {
+           $query = $query->where('city', 'like', "%" . $searchTerm->Location . "%");
+        }
+        if ($searchTerm->area_unit) {
+            $query = $query->where('area_unit', $searchTerm->area_unit);
+        }
+        if ($searchTerm->type) {
+            $query = $query->where('type', $searchTerm->type);
+        }
+        if ($searchTerm->Bathrooms) {
+            $query = $query->where('bathroom', $searchTerm->Bathrooms);
+        }
+        if ($searchTerm->Bedrooms) {
+            $query = $query->where('bedroom', $searchTerm->Bedrooms);
+        }
+        if ($searchTerm->availability_condition) {
+            $query = $query->where('availability_condition', $searchTerm->availability_condition);
+        }
+        if ($searchTerm->Years) {
+            $query = $query->where('buildyear', $searchTerm->Years);
+        }
+        if ($searchTerm->Minimum && $searchTerm->Maximum) {
+            $min=(int)$searchTerm->Minimum;
+            $max=(int)$searchTerm->Maximum;            
+            $query =$query->where('expected_pricing', '>=',$min)->where('expected_pricing', '<=', $max);
+        }
+        if ($searchTerm->property_status== "all") {
+            $query = $query->orderBy('id', 'desc');
+        }
+        if ($searchTerm->property_status== "Recently") {
+            $query = $query->orderBy('id', 'desc')->take(8);
+        }
+        if ($searchTerm->property_status== "Viewed") {
+            $query = $query->where('view_counter', '>=',1)->orderBy('view_counter', 'desc');
+        }
+        return $query;  
     }
 
 }
