@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::resource('amenities', 'App\Http\Controllers\Api\AmenitieController');
 
 
 Route::group([
@@ -24,7 +25,7 @@ Route::group([
 ], function () {
     Route::post('/login', 'App\Http\Controllers\Api\AuthController@login');
     Route::post('/user_signup', 'App\Http\Controllers\Api\AuthController@user_signup');
-
+    Route::get('/get_product_featured', 'App\Http\Controllers\Api\ProductController@index_featured');
 
     Route::post('/owner_signup', 'App\Http\Controllers\Api\AuthController@owner_signup');
     Route::post('/dealer_signup', 'App\Http\Controllers\Api\AuthController@dealer_company_signup');
@@ -67,6 +68,7 @@ Route::group([
     Route::post('/lawyer_page', 'App\Http\Controllers\Api\LawyerController@lawyer_check');
 
     Route::post('/product_review', 'App\Http\Controllers\Api\ReviewsController@product_review');Route::post('/product_Searching', 'App\Http\Controllers\Api\ProductController@propertysearch_list');
+        Route::get('/testimonial', 'App\Http\Controllers\Api\ReviewsController@testimonial');
 
     Route::group([
         'middleware' => 'auth:api'
@@ -98,6 +100,9 @@ Route::group([
         Route::get('/lawyer_service', 'App\Http\Controllers\Api\LawyerController@lawyer_service');
         Route::post('/lawyer_service_delete', 'App\Http\Controllers\Api\LawyerController@lawyer_service_delete');
        Route::post('/product_Searching_login', 'App\Http\Controllers\Api\ProductController@User_propertysearchlist');
+       Route::get('/get_product_wishlist', 'App\Http\Controllers\Api\ProductController@index_featured_wishlist');
+        Route::resource('wishlist', 'App\Http\Controllers\Api\WishlistController');
+        Route::post('wishlistDelete', 'App\Http\Controllers\Api\WishlistController@delete');
 
 
     });

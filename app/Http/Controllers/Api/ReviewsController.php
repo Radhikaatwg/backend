@@ -24,6 +24,14 @@ class ReviewsController extends Controller
             'data' => reviews::where('user_id', $user_id)->get()
         ]);
     }
+    public function testimonial()
+    {
+        // $user_id = Auth::user()->id;
+
+        return response()->json([
+            'data' => reviews::with('UserDetail')->orderBy('id', 'desc')->take(6)->get()
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.

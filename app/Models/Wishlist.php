@@ -5,24 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class reviews extends Model
+class Wishlist extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'user_id',
-        'user_name',
-        'property_name',
-        'product_id',
-        'stars',
-        'rev_subject',
-        'rev_content',
-
+        'user_id','product_id','status',
     ];
+
+    
+    public function productdetails()
+    {
+        return $this->hasOne('App\Models\product', 'id','product_id');
+    }
+    
     public function UserDetail()
     {
         return $this->hasOne('App\Models\User', 'id','user_id');
     }
-
-
 }
