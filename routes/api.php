@@ -17,8 +17,16 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+//Route::post('/blog-create-post', 'App\Http\Controllers\PostController@store');
+//Route::resource('/blog', PostsController::class);																				
 Route::resource('amenities', 'App\Http\Controllers\Api\AmenitieController');
+Route::middleware('auth:api')->post('posts', 'App\Http\Controllers\PostController@store');
+Route::get('posts', 'App\Http\Controllers\PostController@index');
+Route::get('posts_latest', 'App\Http\Controllers\PostController@index_latest');
 
+Route::get('posts/{post}', 'App\Http\Controllers\PostController@show');
+Route::middleware('auth:api')->post('posts/update/{slug}', 'App\Http\Controllers\PostController@update');
+Route::middleware('auth:api')->delete('posts/delete/{slug}', 'App\Http\Controllers\PostController@destroy');
 
 Route::group([
     'prefix' => 'auth'
