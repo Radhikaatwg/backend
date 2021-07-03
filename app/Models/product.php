@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ProductAmenties;
 
 class product extends Model
 {
@@ -132,6 +133,16 @@ class product extends Model
         }
         if ($searchTerm->property_status== "Viewed") {
             $query = $query->where('view_counter', '>=',1)->orderBy('view_counter', 'desc');
+        } 
+        if ($searchTerm->amenities) {
+            $amenities_data = ProductAmenties::select('product_id')->whereIn('amenties',$searchTerm->amenities)->get();
+             $amenitiesID=json_decode(json_encode($amenities_data), true);
+             $length=count($amenitiesID);
+              $array=[]; 
+            for($i=0; $i<$length; $i++){
+                array_push($array,$amenitiesID[$i]['product_id']);
+            }
+            $query = $query->whereIn('id',$array)->orderBy('id', 'desc');            
         }
         return $query;  
     }

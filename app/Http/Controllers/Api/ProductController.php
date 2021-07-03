@@ -14,6 +14,7 @@ use Image;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Models\Wishlist;
+use App\Models\ProductAmenties;
 class ProductController extends Controller
 {
     /**
@@ -273,7 +274,7 @@ class ProductController extends Controller
             'brokerage_charges' => '' ,
             'facing_towards' => 'required' ,
             'availability_condition' => 'required' ,
-            'amenities' => 'required' ,
+            // 'amenities' => 'required' ,
             'buildyear' => 'required' ,
             'age_of_property' => 'required' ,
             'description' => 'required' ,
@@ -371,7 +372,7 @@ class ProductController extends Controller
             'brokerage_charges' => $request->brokerage_charges,
             'facing_towards' => $request->facing_towards,
             'availability_condition' => $request->availability_condition,
-            'amenities' => json_encode($request->amenities),
+            // 'amenities' => json_encode($request->amenities),
             'buildyear' => $request->buildyear,
             'age_of_property' => $request->age_of_property,
             'description' => $request->description,
@@ -389,7 +390,19 @@ class ProductController extends Controller
         $product_data-> save();
         eventtracker::create(['symbol_code' => '8', 'event' => Auth::user()->name.' created a new property listing for sale.']);
 
+         $product_id=$product_data->id;
+           $user_id = Auth::user()->id;
+           $amenities=$request->amenities;
+           $length=count($amenities);
+           for($i=0; $i<$length;$i++){
+             $ProductAmenties = [
+                    'amenties' =>$amenities[$i],
+                    'user_id' => $user_id,
+                    'product_id' => $product_id
+                ];
+                ProductAmenties::create($ProductAmenties);
 
+            }
         return response()->json([
                 'message' => 'Successfully inserted product for sale',
             ], 201);
@@ -451,7 +464,7 @@ class ProductController extends Controller
             'price_negotiable' => 'required' ,
             'deposit' => '' ,
             'brokerage_charges' => '' ,
-            'amenities' => 'required' ,
+            // 'amenities' => 'required' ,
             'facing_towards' => 'required' ,
             'availability_condition' => 'required' ,
             'expected_rent' => 'required' ,
