@@ -77,6 +77,61 @@ class ProductController extends Controller
           ], 201);
         
     }
+    public function Recently_view()
+    {
+        $product = product::with('UserDetail')->where('delete_flag', 0)->where('view_counter', '>=',1)->orderBy('view_counter', 'desc')->take(4)->get();
+
+        return response()->json([
+            'data' =>$product,
+          ], 201);
+        
+    }
+    
+     public function search_prod_by_city(Request $request){
+
+
+        $request->validate([
+            'cityValue' => 'required',
+        ]);
+            $city = $request->cityValue;
+
+        $productSimilar=product::with('UserDetail')->where('city', $city)->orderBy('id', 'desc')->take(6)->get();
+
+            return response()-> json([
+                'product' => $productSimilar,
+            ]);
+
+     }
+     
+     public function loginSimilarproperty(Request $request)
+     {
+        $city = $request->cityValue;  
+        $user_id = Auth::user()->id;
+        $product = product::with('UserDetail')->where('city', $city)->orderBy('id', 'desc')->take(6)->get();
+        $Wishlist=Wishlist::where('user_id', $user_id)->orderBy('id', 'asc')->get();
+        $productcount = count($product);
+        $wishlistcount = count($Wishlist);
+
+       $productArray = json_decode(json_encode($product), true);
+       $WishlistArray = json_decode(json_encode($Wishlist), true);
+        // dd($productArray);
+       
+       // wishlist check with product id nd wishlist id
+       for ($i=0; $i < $productcount; $i++) {    
+            for ($j=0; $j < $wishlistcount; $j++) { 
+                if($productArray[$i]['id']==$WishlistArray[$j]['product_id']){
+                    $addWishlist="true";
+                    array_push($productArray[$i],$addWishlist);
+                }
+            }
+        }
+        if($productArray){
+            return response()->json([
+            'product' =>$productArray,
+          ], 201);
+        }
+
+     }
     public function User_propertysearchlist(Request $request)
     {
         $user_id = Auth::user()->id;
