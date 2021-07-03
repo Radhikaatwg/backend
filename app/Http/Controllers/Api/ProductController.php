@@ -86,7 +86,7 @@ class ProductController extends Controller
           ], 201);
         
     }
-    
+
      public function search_prod_by_city(Request $request){
 
 
@@ -188,41 +188,11 @@ class ProductController extends Controller
 
      public function search_func(Request $request){
 
-        $request->validate([
-            'build_name' => 'required',
-            'type' => 'required',
-            'city' => 'required'
-        ]);
-        $prod_query1 = $request->build_name;
-        $prod_query2 = $request->type;
-        $prod_query3 = $request->city;
-
-
-        // log::info($prod_query1);
-        // log::info($prod_query2);
-        // log::info($prod_query3);
-
-        // $needles = explode(',', $q);
-
-        // In my case, I wanted to split the string when a comma or a whitespace is found:
-        // $needles = preg_split('/[\s,]+/', $q);
-
-        // $products = product::where('build_name', 'LIKE', "%{$q}%");
-
-        $products = product::Where('build_name', 'like', '%' . $prod_query1 . '%')
-            ->orWhere('type', 'like', '%' . $prod_query2 . '%')
-               ->orWhere('city', 'like', '%' . $prod_query3 . '%');
-
-
-        // foreach ($needles as $needle) {
-        //     $products = $products->orWhere('build_name', 'LIKE', "%{$needle}%");
-        // }
-
-        $products = $products->paginate(150);
-
-        return response()-> json([
-            'product' => $products,
-        ]);
+        
+        $product = product::with('UserDetail')->where('delete_flag', 0)->search($request)->get();
+        return response()->json([
+            'product' =>$product,
+          ], 201);
      }
 
 
