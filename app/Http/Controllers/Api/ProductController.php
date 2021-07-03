@@ -601,7 +601,7 @@ class ProductController extends Controller
             'price_negotiable' => $request->price_negotiable ,
             'deposit' => $request->deposit ,
             'brokerage_charges' => $request->brokerage_charges ,
-            'amenities' => json_encode($request->amenities) ,
+            // 'amenities' => json_encode($request->amenities) ,
             'facing_towards' => $request->facing_towards ,
             'availability_condition' => $request->availability_condition ,
             'expected_rent' => $request->expected_rent ,
@@ -621,7 +621,19 @@ class ProductController extends Controller
 
             $product_data->save();
             eventtracker::create(['symbol_code' => '8', 'event' => Auth::user()->name.' created a new property listing for rent.']);
+             $product_id=$product_data->id;
+               $user_id = Auth::user()->id;
+               $amenities=$request->amenities;
+               $length=count($amenities);
+               for($i=0; $i<$length;$i++){
+                 $ProductAmenties = [
+                        'amenties' =>$amenities[$i],
+                        'user_id' => $user_id,
+                        'product_id' => $product_id
+                    ];
+                    ProductAmenties::create($ProductAmenties);
 
+                }
 
             return response()->json([
                 'message' => 'Successfully inserted product for rent',
