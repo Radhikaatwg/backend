@@ -622,18 +622,18 @@ class ProductController extends Controller
             $product_data->save();
             eventtracker::create(['symbol_code' => '8', 'event' => Auth::user()->name.' created a new property listing for rent.']);
              $product_id=$product_data->id;
-               $user_id = Auth::user()->id;
-               $amenities=$request->amenities;
-               $length=count($amenities);
-               for($i=0; $i<$length;$i++){
-                 $ProductAmenties = [
-                        'amenties' =>$amenities[$i],
-                        'user_id' => $user_id,
-                        'product_id' => $product_id
-                    ];
-                    ProductAmenties::create($ProductAmenties);
+                       $user_id = Auth::user()->id;
+                       $amenities=$request->amenities;
+                       $length=count($amenities);
+                       for($i=0; $i<$length;$i++){
+                         $ProductAmenties = [
+                                'amenties' =>$amenities[$i],
+                                'user_id' => $user_id,
+                                'product_id' => $product_id
+                            ];
+                            ProductAmenties::create($ProductAmenties);
 
-                }
+                        }
 
             return response()->json([
                 'message' => 'Successfully inserted product for rent',
