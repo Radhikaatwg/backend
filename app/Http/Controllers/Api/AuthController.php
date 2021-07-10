@@ -18,7 +18,50 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-    public function user_signup(Request $request){
+
+    /* Code added by Radhika Start */
+    public function user_signup_new(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required',
+            'email' => 'required|string|unique:users',
+            'other_mobile_number' => 'required|integer|unique:users',
+            'selectType' => 'required',
+            'agree_check' => 'required|boolean',
+            'password' => 'required|string|confirmed'
+        ]);
+
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_sid = getenv("TWILIO_SID");
+        $twilio_verify_sid = getenv("TWILIO_VERIFY_SID");
+        $twilio = new Client($twilio_sid, $token);
+        $twilio->verify->v2->services($twilio_verify_sid)
+            ->verifications
+            ->create("+91".$request->other_mobile_number, "sms");
+
+        $user = new User([
+            'name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'usertype' => 3,
+            'userSelect_type' => $request->selectType,
+            'other_mobile_number' => $request->other_mobile_number,
+            'password' => bcrypt($request->password)
+        ]);
+
+        $user->save();
+        eventtracker::create(['symbol_code' => '1', 'event' => $request->email.' created a new account as a User']);
+
+        return response()->json([
+            'data' => $user,
+            'message' => 'Successfully created user!'
+        ], 201);
+    }
+
+    /* Code added by Radhika End */
+    
+    public function user_signup(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'email' => 'required|string|unique:users',
@@ -61,7 +104,8 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function owner_signup(Request $request){
+    public function owner_signup(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'email' => 'required|string|unique:users',
@@ -111,7 +155,8 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function dealer_company_signup(Request $request){
+    public function dealer_company_signup(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'email' => 'required|string|unique:users',
@@ -171,7 +216,8 @@ class AuthController extends Controller
 
 
 
-    public function lawyer_signup(Request $request){
+    public function lawyer_signup(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'email' => 'required|string|unique:users',
@@ -290,29 +336,32 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request){
-
+    public function login(Request $request)
+    {
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
         $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials))
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Invalid Username or Password'
             ], 401);
+        }
         $user = $request->user();
 
-        if ($user->blocked == 1)
+        if ($user->blocked == 1) {
             return response()->json([
                 'message' => 'Your account is blocked'
             ], 403);
+        }
 
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
-        if ($request->remember_me)
+        if ($request->remember_me) {
             $token->expires_at = Carbon::now()->addWeeks(20);
+        }
         $token->save();
         return response()->json([
             'username' => $user->name,
@@ -327,19 +376,27 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $request->user()->token()->revoke();
         return response()->json([
             'message' => 'Successfully logged out'
         ]);
     }
 
-    public function user(Request $request){
+    public function user(Request $request)
+    {
         return response()->json($request->user());
     }
 
+    public function verify_user(Request $request)
+    {
+        return response()->json($request->user()->only(['phone_number_verification_status', 'name', 'email']));
+    }
 
-    public function company_signup(Request $request){
+
+    public function company_signup(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'email' => 'required|string|unique:users',
@@ -374,7 +431,8 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function admin_signup(Request $request){
+    public function admin_signup(Request $request)
+    {
         $request->validate([
             'name' => 'required',
             'email' => 'required|string|unique:users',
@@ -408,17 +466,18 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function admin_login(Request $request){
-
+    public function admin_login(Request $request)
+    {
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
         $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials))
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Invalid Admin Credentials'
             ], 401);
+        }
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
@@ -437,7 +496,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function forgot_password(Request $request){
+    public function forgot_password(Request $request)
+    {
         $input = $request->all();
         $rules = array(
             'email' => "required|email",
@@ -481,7 +541,7 @@ class AuthController extends Controller
             try {
                 if ((Hash::check(request('old_password'), Auth::user()->password)) == false) {
                     $arr = array("status" => 400, "message" => "Check your old password.", "data" => array());
-                } else if ((Hash::check(request('new_password'), Auth::user()->password)) == true) {
+                } elseif ((Hash::check(request('new_password'), Auth::user()->password)) == true) {
                     $arr = array("status" => 400, "message" => "Please enter a password which is not similar then current password.", "data" => array());
                 } else {
                     User::where('id', $userid)->update(['password' => Hash::make($input['new_password'])]);
@@ -499,17 +559,18 @@ class AuthController extends Controller
         return \Response::json($arr);
     }
 
-    public function googleredirect(){
+    public function googleredirect()
+    {
         return Socialite::driver('google')->redirect();
     }
 
-    public function googlecallback(){
+    public function googlecallback()
+    {
         $user = Socialite::driver('google')->user();
 
         $finduser = User::where('email', $user->email)->first();
 
-        if($finduser){
-
+        if ($finduser) {
             Auth::login($finduser);
 
 
@@ -518,9 +579,10 @@ class AuthController extends Controller
             $token->expires_at = Carbon::now()->addWeeks(20);
             $token->save();
 
-            return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$finduser);
+            //return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$finduser);
+            return redirect()->to(env('APP_REDIRECT_URL').'/login?token='.$tokenResult->accessToken.'&data='.$finduser);
 
-            // return response()->json([
+        // return response()->json([
 
             //     'username' => $finduser->name,
             //     'id' => $finduser->id,
@@ -532,12 +594,12 @@ class AuthController extends Controller
             //     )->toDateTimeString(),
             //     'misc' => $finduser
             //     ]);
-
-        }else{
+        } else {
             $newUser = User::create([
                 'name' => $user->name,
                 'email' => $user->email,
                 'usertype' => 1,
+                'userSelect_type' => 1,
                 'profile_pic' => $user->avatar_original,
                 'other_mobile_number' => 1234567890,
                 'phone_number_verification_status' => 1,
@@ -554,8 +616,9 @@ class AuthController extends Controller
             $token->expires_at = Carbon::now()->addWeeks(20);
             $token->save();
 
-            return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$datauser);
-
+            //return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$datauser);
+            return redirect()->to(env('APP_REDIRECT_URL').'/login?token='.$tokenResult->accessToken.'&data='.$datauser);
+    
             // return response()->json([
             //     'username' => $datauser->name,
             //     'id' => $datauser->id,
@@ -568,7 +631,5 @@ class AuthController extends Controller
             //     'misc' => $datauser
             //     ]);
         }
-
     }
-
 }

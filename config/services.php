@@ -33,7 +33,8 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => 'https://admin.housingstreet.com/api/auth/callback',
+        //'redirect' => 'https://admin.housingstreet.com/api/auth/callback',
+		'redirect' => 'http://localhost:8000/api/auth/callback',
     ],
 
 ];
