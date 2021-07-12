@@ -114,9 +114,13 @@ Route::group([
         Route::get('/lawyer_service', 'App\Http\Controllers\Api\LawyerController@lawyer_service');
         Route::post('/lawyer_service_delete', 'App\Http\Controllers\Api\LawyerController@lawyer_service_delete');
         Route::post('/product_Searching_login', 'App\Http\Controllers\Api\ProductController@User_propertysearchlist');
+        Route::post('/Propery_get_id', 'App\Http\Controllers\Api\ProductController@Propery_get_id');
         Route::get('/get_product_wishlist', 'App\Http\Controllers\Api\ProductController@index_featured_wishlist');
         Route::resource('wishlist', 'App\Http\Controllers\Api\WishlistController');
         Route::post('wishlistDelete', 'App\Http\Controllers\Api\WishlistController@delete');
+         Route::post('User_productCount', 'App\Http\Controllers\Api\UserProductCountController@count_byID');
+        Route::get('User_CountData', 'App\Http\Controllers\Api\UserProductCountController@index');
+
     });
     // Route::get('/home', 'App\Http\Controllers\Api\HomeController@index')->name('home');
 });

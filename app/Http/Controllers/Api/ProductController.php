@@ -845,6 +845,19 @@ class ProductController extends Controller
         ]);
 
     }
+    public function Propery_get_id(Request $request)
+    {
+      $request -> validate([
+            'id' => 'required'
+        ]);
+
+        $product = product::where('id', $request->id)->first();
+
+
+        return response()->json([
+            'data' => $product
+        ]);
+    }
 
     public function store(Request $request)
     {
