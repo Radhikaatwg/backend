@@ -89,6 +89,10 @@ class product extends Model
     {
         return $this->hasMany('App\Models\Wishlist', 'product_id','id');
     }
+    public function amenities()
+    {
+        return $this->hasMany('App\Models\ProductAmenties', 'product_id','id');
+    }
 
     public function roles()
     {
@@ -123,7 +127,7 @@ class product extends Model
         if ($searchTerm->Minimum && $searchTerm->Maximum) {
             $min=(int)$searchTerm->Minimum;
             $max=(int)$searchTerm->Maximum;            
-            $query =$query->where('expected_pricing', '>=',$min)->where('expected_pricing', '<=', $max);
+            $query =$query->where('expected_pricing', '>=',$min)->where('expected_pricing', '<=', $max)->orWhere('expected_rent', '>=',$min)->orWhere('expected_rent', '>=',$max);
         }
         if ($searchTerm->property_status== "all") {
             $query = $query->orderBy('id', 'desc');

@@ -137,7 +137,9 @@ Route::group([
     Route::group([
         'middleware' => 'auth:api'
     ], function () {
-        Route::post('/product_sale_update', 'App\Http\Controllers\Api\AdminController@update_product');
+
+      Route::post('/product_Rent_update', 'App\Http\Controllers\Api\AdminController@update_Rent_product');
+        Route::post('/product_sales_update', 'App\Http\Controllers\Api\AdminController@update_Sales_product');
         Route::post('/delete_product_admin', 'App\Http\Controllers\Api\AdminController@delete_product');
         Route::post('/user_page', 'App\Http\Controllers\Api\AdminController@user_check');
         Route::post('/user_update', 'App\Http\Controllers\Api\AdminController@user_update');

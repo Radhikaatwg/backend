@@ -14,7 +14,9 @@ use Image;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Models\Wishlist;
+use App\Models\Amenitie;
 use App\Models\ProductAmenties;
+use App\Models\UserProductCount;
 class ProductController extends Controller
 {
     /**
@@ -173,7 +175,9 @@ class ProductController extends Controller
         ]);
             $prod_id = $request->prod_id;
 
-        $product_id_func = product::find($prod_id)->productid;
+        // $product_id_func = product::find($prod_id)->productid;
+         $product_id_func = product::where('id', $prod_id)->with('amenities')->get();
+
         $userid = DB::table('products')->select('user_id')->where("id", $prod_id)->value("value");
         $user_details = DB::table('users')->select('id','name','email','profile_pic')->where('id', $userid)->get();
 
@@ -622,18 +626,18 @@ class ProductController extends Controller
             $product_data->save();
             eventtracker::create(['symbol_code' => '8', 'event' => Auth::user()->name.' created a new property listing for rent.']);
              $product_id=$product_data->id;
-                       $user_id = Auth::user()->id;
-                       $amenities=$request->amenities;
-                       $length=count($amenities);
-                       for($i=0; $i<$length;$i++){
-                         $ProductAmenties = [
-                                'amenties' =>$amenities[$i],
-                                'user_id' => $user_id,
-                                'product_id' => $product_id
-                            ];
-                            ProductAmenties::create($ProductAmenties);
+               $user_id = Auth::user()->id;
+               $amenities=$request->amenities;
+               $length=count($amenities);
+               for($i=0; $i<$length;$i++){
+                 $ProductAmenties = [
+                        'amenties' =>$amenities[$i],
+                        'user_id' => $user_id,
+                        'product_id' => $product_id
+                    ];
+                ProductAmenties::create($ProductAmenties);
 
-                        }
+                }
 
             return response()->json([
                 'message' => 'Successfully inserted product for rent',
@@ -659,6 +663,8 @@ class ProductController extends Controller
             ], 401);
 
         product::where('id', $request->product_id)->update(['delete_flag' => 1 ]);
+          UserProductCount::where('user_id', $user_id)->where('product_id', $request->product_id)->delete();
+
         return response()->json([
             'message' => 'Successfully deleted Product',
         ], 201);
@@ -696,30 +702,30 @@ class ProductController extends Controller
 
     public function update_product(Request $request)
     {
-
+    
         $request -> validate([
-            'id' => 'required',
-            'view_counter' => 'required',
-            'address' => 'required',
-            'city' => 'required',
-            'rent_cond' => 'required',
-            'rent_availability' => 'required',
-            'sale_availability' => 'required',
-            'possession_by' => 'required',
-            'locality' => 'required',
-            'display_address' => 'required',
-            'ownership' => 'required',
-            'expected_pricing' => 'required',
-            'inclusive_pricing_details' => 'required',
-            'tax_govt_charge' => 'required',
-            'price_negotiable' => 'required',
-            'maintenance_charge_status' => 'required',
-            'maintenance_charge' => 'required',
-            'maintenance_charge_condition' => 'required',
-            'deposit' => 'required',
-            'available_for' => 'required',
-            'brokerage_charges' => 'required',
-            'type' => 'required',
+            // 'id' => 'required',
+            // // 'view_counter' => 'required',
+            // 'address' => 'required',
+            // 'city' => 'required',
+            // 'rent_cond' => 'required',
+            // 'rent_availability' => 'required',
+            // 'sale_availability' => 'required',
+            // 'possession_by' => 'required',
+            // 'locality' => 'required',
+            // 'display_address' => 'required',
+            // 'ownership' => 'required',
+            // 'expected_pricing' => 'required',
+            // 'inclusive_pricing_details' => 'required',
+            // 'tax_govt_charge' => 'required',
+            // 'price_negotiable' => 'required',
+            // 'maintenance_charge_status' => 'required',
+            // 'maintenance_charge' => 'required',
+            // 'maintenance_charge_condition' => 'required',
+            // 'deposit' => 'required',
+            // 'available_for' => 'required',
+            // 'brokerage_charges' => 'required',
+            // 'type' => 'required',
             // 'product_image1' => 'required',
             // 'product_image2' => 'required',
             // 'product_image3' => 'required',
@@ -851,12 +857,19 @@ class ProductController extends Controller
             'id' => 'required'
         ]);
 
-        $product = product::where('id', $request->id)->first();
-
-
-        return response()->json([
-            'data' => $product
-        ]);
+       $user_id = Auth::user()->id;
+        $product = product::where('id', $request->id)->where('user_id',$user_id)->with('amenities')->first();
+       
+       if($product){
+            return response()->json([
+                'data' => $product
+            ]);
+       }else{
+            $product=['id'=>0];
+            return response()->json([
+                'data' => $product
+            ]);
+        }
     }
 
     public function store(Request $request)
