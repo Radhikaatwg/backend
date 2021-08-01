@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 //Route::post('/blog-create-post', 'App\Http\Controllers\PostController@store');
 //Route::resource('/blog', PostsController::class);
 Route::resource('amenities', 'App\Http\Controllers\Api\AmenitieController');
+Route::post('contact-form', 'App\Http\Controllers\ContactController@store');																			
 Route::middleware('auth:api')->post('posts', 'App\Http\Controllers\PostController@store');
 Route::get('posts', 'App\Http\Controllers\PostController@index');
 Route::get('posts_latest', 'App\Http\Controllers\PostController@index_latest');
@@ -34,6 +35,7 @@ Route::group([
 ], function () {
     Route::post('/login', 'App\Http\Controllers\Api\AuthController@login');
     Route::post('/user_signup', 'App\Http\Controllers\Api\AuthController@user_signup');
+	Route::post('/verify_mobile', 'App\Http\Controllers\Api\AuthController@verify_mobile_number');																							  
     Route::post('/user_signup_new', 'App\Http\Controllers\Api\AuthController@user_signup_new');
     Route::get('/get_product_featured', 'App\Http\Controllers\Api\ProductController@index_featured');
 
@@ -42,6 +44,7 @@ Route::group([
     Route::post('/lawyer_signup', 'App\Http\Controllers\Api\AuthController@lawyer_signup');
 
     Route::post('/verify', 'App\Http\Controllers\Api\AuthController@verify');
+	Route::post('/verify_mob', 'App\Http\Controllers\Api\AuthController@verify_mob');																				 
     Route::post('/reverify', 'App\Http\Controllers\Api\AuthController@reverify');
     Route::post('/forgot_password', 'App\Http\Controllers\Api\AuthController@forgot_password');
 
@@ -58,6 +61,7 @@ Route::group([
         Route::get('/logout', 'App\Http\Controllers\Api\AuthController@logout');
         Route::get('/user', 'App\Http\Controllers\Api\AuthController@user');
         Route::get('/verify_user', 'App\Http\Controllers\Api\AuthController@verify_user');
+		Route::get('/verify_user_mobile', 'App\Http\Controllers\Api\AuthController@verify_user_mobile');																								
         Route::post('/change_password', 'App\Http\Controllers\Api\AuthController@change_password');
     });
     // Route::get('/home', 'App\Http\Controllers\Api\HomeController@index')->name('home');

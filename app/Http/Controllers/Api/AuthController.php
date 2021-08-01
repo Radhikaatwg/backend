@@ -104,6 +104,21 @@ class AuthController extends Controller
         ], 201);
     }
 
+    public function verify_mobile_number(Request $request) {
+        $request->validate([ 
+            'other_mobile_number' => 'required|integer|unique:users'
+        ]);
+
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_sid = getenv("TWILIO_SID");
+        $twilio_verify_sid = getenv("TWILIO_VERIFY_SID");
+        $twilio = new Client($twilio_sid, $token);
+        $twilio->verify->v2->services($twilio_verify_sid)
+            ->verifications
+            ->create("+91".$request->other_mobile_number, "sms");
+
+    } 
+
     public function owner_signup(Request $request)
     {
         $request->validate([
@@ -305,6 +320,37 @@ class AuthController extends Controller
         ], 401);
     }
 
+    /* Code added by Radhika Start */
+
+    public function verify_mob(Request $request)
+    {
+        $data = $request->validate([
+            'verification_code' => 'required|string',
+            'other_mobile_number' => 'required|string|unique:users',
+            'user_id' => 'required|numeric'
+        ]);
+        /* Get credentials from .env */
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_sid = getenv("TWILIO_SID");
+        $twilio_verify_sid = getenv("TWILIO_VERIFY_SID");
+        $twilio = new Client($twilio_sid, $token);
+        $verification = $twilio->verify->v2->services($twilio_verify_sid)
+            ->verificationChecks
+            ->create($data['verification_code'], array('to' => "+91".$data['other_mobile_number']));
+
+        if ($verification->valid) {
+            User::where('id', $data['user_id'])->update(['other_mobile_number' => $data['other_mobile_number'], 'phone_number_verification_status' => 1]);
+            return response()->json([
+                'message' => 'Successfully verified'
+            ], 201);
+        }
+        return response()->json([
+            'message' => 'verification error'
+        ], 401);
+    }
+
+    /* Code added by Radhika End */
+
     public function reverify(Request $request)
     {
         $data = $request->validate([
@@ -394,6 +440,11 @@ class AuthController extends Controller
         return response()->json($request->user()->only(['phone_number_verification_status', 'name', 'email']));
     }
 
+    public function verify_user_mobile(Request $request)
+    {
+        $user = $request->user();
+        return response()->json($user->phone_number_verification_status);
+    }
 
     public function company_signup(Request $request)
     {
