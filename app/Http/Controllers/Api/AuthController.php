@@ -432,6 +432,7 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
+       // $request->user()->profile_pic = asset('storage/images/' . $request->user()->profile_pic);
         return response()->json($request->user());
     }
 
@@ -576,6 +577,25 @@ class AuthController extends Controller
         return \Response::json($arr);
     }
 
+    public function upload_profile_pic(Request $request) {
+
+        
+        $request->validate([
+            'profile_image' => 'required|mimes:jpg,png,jpeg',
+            'id' => 'required'			
+        ]); 
+
+        $newPostImageName = uniqid() . '-' . $request->file('profile_image')->getClientOriginalName();
+        $request->file('profile_image')->move(public_path('storage/images'), $newPostImageName);
+
+        User::where('id', $request['id'])->update(['profile_pic' => $newPostImageName]);
+
+        return response() -> json ([
+            'message' => 'The profile picture has been updated'
+        ], 201); 
+    }
+
+
     public function change_password(Request $request)
     {
         $input = $request->all();
@@ -629,9 +649,11 @@ class AuthController extends Controller
             $token = $tokenResult->token;
             $token->expires_at = Carbon::now()->addWeeks(20);
             $token->save();
+           // return redirect()->to(env('APP_REDIRECT_URL').'/');
 
-            //return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$finduser);
+            /*return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$finduser);*/
             return redirect()->to(env('APP_REDIRECT_URL').'/login?token='.$tokenResult->accessToken.'&data='.$finduser);
+            
 
         // return response()->json([
 
@@ -669,6 +691,7 @@ class AuthController extends Controller
 
             //return redirect()->to('https://www.housingstreet.com/login?token='.$tokenResult->accessToken.'&data='.$datauser);
             return redirect()->to(env('APP_REDIRECT_URL').'/login?token='.$tokenResult->accessToken.'&data='.$datauser);
+            //return redirect()->to(env('APP_REDIRECT_URL').'/profile');
     
             // return response()->json([
             //     'username' => $datauser->name,

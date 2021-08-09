@@ -61,7 +61,8 @@ Route::group([
         Route::get('/logout', 'App\Http\Controllers\Api\AuthController@logout');
         Route::get('/user', 'App\Http\Controllers\Api\AuthController@user');
         Route::get('/verify_user', 'App\Http\Controllers\Api\AuthController@verify_user');
-		Route::get('/verify_user_mobile', 'App\Http\Controllers\Api\AuthController@verify_user_mobile');																								
+		Route::get('/verify_user_mobile', 'App\Http\Controllers\Api\AuthController@verify_user_mobile');	
+        Route::post('/upload_profile_pic', 'App\Http\Controllers\Api\AuthController@upload_profile_pic');																							
         Route::post('/change_password', 'App\Http\Controllers\Api\AuthController@change_password');
     });
     // Route::get('/home', 'App\Http\Controllers\Api\HomeController@index')->name('home');

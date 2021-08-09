@@ -60,7 +60,6 @@ class ReviewsController extends Controller
 
         $property_name = product::select('build_name')->where('id', $request->product_id)->value('build_name');
 
-
         $review = new Reviews([
             'user_id' => Auth::user()->id,
             'user_name' => Auth::user()->name,
